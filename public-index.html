@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ka Ndeke – Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1c2d;
+      color: #fff;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 60px;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .connected {
+      color: #00ff9c;
+    }
+
+    .reachable {
+      color: orange;
+    }
+
+    .offline {
+      color: red;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 12px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ka Ndeke Backend Status</h1>
+
+  <div id="status" class="reachable">REACHABLE</div>
+
+  <button onclick="checkConnection()">Recheck</button>
+
+  <script>
+    // 🔒 HARD-CODED BACKEND URL (THIS IS THE KEY)
+    const BACKEND_URL = "https://ka-ndeke-backend-momo.onrender.com";
+
+    function setStatus(text, className) {
+      const el = document.getElementById("status");
+      el.textContent = text;
+      el.className = className;
+    }
+
+    async function checkConnection() {
+      try {
+        const res = await fetch(BACKEND_URL + "/health", {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+
+        if (
+          data.ok === true ||
+          data.connected === true ||
+          data.status === "connected"
+        ) {
+          setStatus("CONNECTED", "connected");
+        } else {
+          setStatus("REACHABLE", "reachable");
+        }
+
+      } catch (err) {
+        console.error(err);
+        setStatus("OFFLINE", "offline");
+      }
+    }
+
+    // Auto-check on load
+    document.addEventListener("DOMContentLoaded", checkConnection);
+  </script>
+
+</body>
+</html> 
